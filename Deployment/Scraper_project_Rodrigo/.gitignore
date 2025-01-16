@@ -1,0 +1,4 @@
+myenv/
+
+# Environment variables
+.env 
