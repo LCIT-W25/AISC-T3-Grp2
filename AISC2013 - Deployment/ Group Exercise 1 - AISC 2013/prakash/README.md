@@ -22,3 +22,7 @@ python main.py # Run the application
 > show collections # Show all collections
 > db.news.find() # Find all documents in the news collection
 ```
+
+
+## Link to VM File
+[Drive Link](https://drive.google.com/drive/folders/1dC6QLF6v1f8zOgZ1404QTFOmR_YOPh5E?usp=sharing)
