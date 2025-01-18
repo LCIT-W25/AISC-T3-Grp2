@@ -100,7 +100,7 @@ class NewsScraper:
 
 def main():
     # Your NewsAPI key here
-    api_key = 'f7d97478e7d5438aab133108205e32b9'  # Replace with your actual NewsAPI key
+    api_key = '60fddc8432944a2d8292e5cf6d3c4bbe'  # Replace with your actual NewsAPI key
 
     # Initialize scraper
     scraper = NewsScraper(db_name="news.db", api_key=api_key)
