@@ -43,8 +43,13 @@ class NewsDatabase:
             ))
         self.conn.commit()
 
-    def fetch_top_articles(self):
-        """Fetch and display the top 5 results from the SQLite database."""
+    def fetch_top_articles_by_category(self, category):
+        """Fetch and display the top 5 results from the SQLite database by category."""
+        self.cursor.execute("SELECT * FROM news WHERE category = ? LIMIT 5", (category,))
+        return self.cursor.fetchall()
+
+    def fetch_top_articles_overall(self):
+        """Fetch and display the top 5 results from the entire SQLite database."""
         self.cursor.execute("SELECT * FROM news LIMIT 5")
         return self.cursor.fetchall()
 
@@ -82,22 +87,35 @@ class NewsScraper:
     def scrape_and_store_news(self):
         """Scrape and store news articles for each category."""
         for category in self.news_api_client.categories:
-            print(f"Fetching news for category: {category}")
+            print(f"\nFetching news for category: {category.capitalize()}")
             news_data = self.news_api_client.fetch_news(category)
             self.db.insert_news(news_data, category)
 
     def display_top_articles(self):
-        """Display the top 5 news articles from the SQLite database in a readable format."""
-        print("Top 5 News Articles in SQLite Database:")
-        top_articles = self.db.fetch_top_articles()
-        for article in top_articles:
-            print(f"ID: {article[0]}")
-            print(f"Title: {article[2]}")
-            print(f"Source: {article[1]}")
-            print(f"Category: {article[8]}")
-            print(f"URL: {article[6]}")
-            print(f"Publish Time: {article[7]}")
-            print("=" * 50)
+        """Display the top 5 news articles from the SQLite database across all categories first."""
+        print("\nTop 5 News Articles Overall:")
+        top_articles = self.db.fetch_top_articles_overall()
+        for row in top_articles:
+            print(f"\nID: {row[0]}")
+            print(f"Title: {row[3]}")
+            print(f"Source: {row[1]}")
+            print(f"Category: {row[8]}")
+            print(f"URL: {row[6]}")
+            print(f"Publish Time: {row[7]}")
+            print("="*50)
+
+        # Now, display category breakdown
+        for category in self.news_api_client.categories:
+            print(f"\nTop 5 Articles in Category: {category.capitalize()}")
+            top_articles_by_category = self.db.fetch_top_articles_by_category(category)
+            for row in top_articles_by_category:
+                print(f"\nID: {row[0]}")
+                print(f"Title: {row[3]}")
+                print(f"Source: {row[1]}")
+                print(f"Category: {row[8]}")
+                print(f"URL: {row[6]}")
+                print(f"Publish Time: {row[7]}")
+                print("="*50)
 
     def close(self):
         """Close the database connection."""
@@ -106,7 +124,7 @@ class NewsScraper:
 
 def main():
     # Your NewsAPI key here
-    api_key = '60fddc8432944a2d8292e5cf6d3c4bbe'  # Replace with your actual NewsAPI key
+    api_key = '60fddc8432944a2d8292e5cf6d3c4bbe'  
 
     # Initialize scraper
     scraper = NewsScraper(db_name="news.db", api_key=api_key)
@@ -114,7 +132,7 @@ def main():
     # Scrape and store news articles
     scraper.scrape_and_store_news()
 
-    # Display top 5 articles
+    # Display top 5 articles across all categories first, then category breakdown
     scraper.display_top_articles()
 
     # Close the connection
