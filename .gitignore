@@ -2,3 +2,6 @@
 .env
 env
 venv
+yelp_academic_dataset
+yelp_academic_dataset.tar
+.ipynb_checkpoints
