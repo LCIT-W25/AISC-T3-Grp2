@@ -5,3 +5,4 @@ venv
 yelp_academic_dataset
 yelp_academic_dataset.tar
 .ipynb_checkpoints
+yelp_academic_review.csv
