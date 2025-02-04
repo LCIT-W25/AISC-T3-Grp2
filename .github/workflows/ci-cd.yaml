@@ -27,12 +27,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest  # Ensure pytest is installed
           if [ -f "AISC2013-Deployment/Assignment 1/requirements.txt" ]; then
-            pip install -r AISC2013-Deployment/Assignment 1/Rodrigo UI/requirements.txt
+            pip install -r "AISC2013-Deployment/Assignment 1/Rodrigo UI/requirements.txt"
+          else
+            echo "requirements.txt not found, skipping installation"
           fi
+
+      - name: Verify File Structure (Debugging Step)
+        run: |
+          echo "Listing all files and directories:"
+          ls -R
 
       - name: Run Unit Tests for Rodrigo's UI
         run: |
-          python -m pytest AISC2013-Deployment/Assignment 1/tests/ui_test_1.py
+          cd "AISC2013-Deployment/Assignment 1/tests"  # Change to the correct directory
+          python -m pytest ui_test_1.py
 
       - name: Run Basic Tests (Placeholder)
         run: |
