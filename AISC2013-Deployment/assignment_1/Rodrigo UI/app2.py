@@ -5,9 +5,14 @@ import io
 import pickle
 import re
 import os
+import json
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 CORS(app)
+
+def load_config():
+    with open("config.json", "r") as f:
+        return json.load(f)
 
 # Function to clean text
 def clean_text(text):
@@ -40,11 +45,17 @@ def custom_preprocessor(text):
     return handle_negation_list(text, negation_words)
 
 # Load models and vectorizer
+with open("untuned_naive_bayes.pkl", "rb") as nb_file:
+    nb_model_v1 = pickle.load(nb_file)
+
+with open("untuned_svm.pkl", "rb") as svm_file:
+    svm_model_v1 = pickle.load(svm_file)
+
 with open("naive_bayes_model.pkl", "rb") as nb_file:
-    nb_model = pickle.load(nb_file)
+    nb_model_latest = pickle.load(nb_file)
 
 with open("svm_model.pkl", "rb") as svm_file:
-    svm_model = pickle.load(svm_file)
+    svm_model_latest = pickle.load(svm_file)
 
 with open("vectorizer.pkl", "rb") as vectorizer_file:
     vectorizer = pickle.load(vectorizer_file)
@@ -98,6 +109,14 @@ def predict():
 
 # Predict sentiment with the selected model
 def predict_sentiment(text, model_choice):
+    config = load_config()
+    USE_LATEST_NB = config["naive_bayes"]["use_latest"]
+    USE_LATEST_SVM = config["svm"]["use_latest"]
+
+    # Select models based on config
+    nb_model = nb_model_latest if USE_LATEST_NB else nb_model_v1
+    svm_model = svm_model_latest if USE_LATEST_SVM else svm_model_v1
+
     X = vectorizer.transform([text])
     
     if model_choice == "SVM":
