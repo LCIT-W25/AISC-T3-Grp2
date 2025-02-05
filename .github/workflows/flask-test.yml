@@ -23,13 +23,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd AISC-T3-Grp2/AISC2013-Deployment/assignment_1/prakash_image_class_ui
+          cd AISC2013-Deployment/assignment_1/prakash_image_class_ui
           python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt  # Ensure your requirements are up to date
 
       - name: Run tests
         run: |
-          cd AISC-T3-Grp2/AISC2013-Deployment/assignment_1/prakash_image_class_ui
+          cd AISC2013-Deployment/assignment_1/prakash_image_class_ui
           source venv/bin/activate
-          pytest  # Assuming you're using pytest for testing, adjust if needed
+          python -m pytest tests.py  # Assuming you're using pytest for testing, adjust if needed
