@@ -41,6 +41,7 @@ jobs:
         run: |
           cd "AISC2013-Deployment/Assignment 1/tests"  # Change to the correct directory
           python -m pytest ui_test_1.py
+          python -m pytest ui_test_2.py
 
       - name: Run Basic Tests (Placeholder)
         run: |
