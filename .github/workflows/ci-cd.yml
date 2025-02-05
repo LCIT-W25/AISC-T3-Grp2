@@ -3,7 +3,7 @@ name: CI/CD Pipeline for Assignment 1
 on:
   push:
     branches:
-      - test
+      - dev
   pull_request:
     branches:
       - test
