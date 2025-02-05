@@ -3,10 +3,10 @@ name: Flask App Test
 on:
   push:
     branches:
-      - prakash-dev # Change this to your default branch
+      - prakash-dev # Adjust to your default branch
   pull_request:
     branches:
-      - prakash-dev # Change this to your default branch
+      - prakash-dev # Adjust to your default branch
 
 jobs:
   test:
@@ -14,22 +14,22 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3 # Update to the latest version
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4 # Updated to the latest setup-python version
         with:
-          python-version: 3.9 # Specify the Python version
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
-          cd AISC2013-Deployment/assignment_1/prakash_image_class_ui
+          cd AISC-T3-Grp2/AISC2013-Deployment/assignment_1/prakash_image_class_ui  # Adjusted to your correct project path
           python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt  # Ensure your requirements are up to date
 
       - name: Run tests
         run: |
-          cd AISC2013-Deployment/assignment_1/prakash_image_class_ui
+          cd AISC-T3-Grp2/AISC2013-Deployment/assignment_1/prakash_image_class_ui  # Ensure you're in the correct directory
           source venv/bin/activate
           python -m pytest tests.py  # Assuming you're using pytest for testing, adjust if needed
