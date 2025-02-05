@@ -1,58 +1,68 @@
-name: CI/CD Pipeline for Assignment 1
+name: CI Test
 
 on:
   push:
     branches:
+      - dev
       - test
   pull_request:
     branches:
+      - dev
       - test
 
 jobs:
-  run-tests:
+  test:
     runs-on: ubuntu-latest
-    name: Run Unit Tests for Assignment 1
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Latest version
 
-      - name: Set up Python Environment
-        uses: actions/setup-python@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4  # Latest setup-python action
         with:
-          python-version: "3.9"
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest  # Ensure pytest is installed
-          if [ -f "AISC2013-Deployment/Assignment 1/Rodrigo UI/requirements.txt" ]; then
-            pip install -r "AISC2013-Deployment/Assignment 1/Rodrigo UI/requirements.txt"
-          else
-            echo "requirements.txt not found, skipping installation"
-          fi
+          python-version: "3.12"
 
       - name: Verify File Structure (Debugging Step)
         run: |
           echo "Listing all files and directories:"
           ls -R
 
-      - name: Run Unit Tests for Rodrigo's UI
+      # Install dependencies and run tests for prakash_image_class_ui
+      - name: Install dependencies for prakash_image_class_ui
         run: |
-          cd "AISC2013-Deployment/Assignment 1/tests"  # Change to the correct directory
-          python -m pytest ui_test_1.py
-          python -m pytest ui_test_2.py
+          cd assignment_1/prakash_image_class_ui
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Run Basic Tests (Placeholder)
+      - name: Run tests for prakash_image_class_ui
         run: |
-          echo "No test framework detected. Running a placeholder test script."
-          python -c "print('Placeholder Test Passed')"
+          cd assignment_1/prakash_image_class_ui
+          source venv/bin/activate
+          python -m unittest ui_test_2.py  # Using unittest instead of pytest
+
+      # Install dependencies and run tests for Rodrigo UI
+      - name: Install dependencies for Rodrigo UI
+        run: |
+          cd assignment_1/Rodrigo\ UI
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests for Rodrigo UI
+        run: |
+          cd assignment_1/Rodrigo\ UI
+          source venv/bin/activate
+          python -m unittest ui_test_1.py  # Using unittest instead of pytest
 
       - name: SonarQube Analysis (Optional)
-        if: ${{ false }}
+        if: ${{ github.event_name == 'push' }}
         run: |
-          echo "SonarQube setup step placeholder here."
-          # Add your SonarQube scan commands here if needed.
+          echo "Running SonarQube Analysis..."
+          # Add actual SonarQube scan commands here if needed.
 
       - name: Exclude Jupyter Notebooks from Deployment
         run: |
@@ -62,4 +72,4 @@ jobs:
       - name: Upload Results to GitHub
         if: always()
         run: |
-          echo "CI/CD Pipeline for Assignment 1 completed."
+          echo "CI/CD Pipeline for AISC-T3-GRP2 completed."
