@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Ensure icons are visible -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white px-4 py-12">
+  <div class="container mx-auto max-w-4xl">
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+      <h1 class="text-6xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-indigo-400">
+        Sentiment Analyzer
+      </h1>
+      <p class="text-xl text-gray-300 mb-2">
+        Powered by Group 2
+      </p>
+      <div class="flex justify-center space-x-2">
+        <span class="text-3xl">😊</span>
+        <span class="text-3xl">😐</span>
+        <span class="text-3xl">😞</span>
+      </div>
+    </div>
+
+    <!-- Model Selection Section -->
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-8 mb-8">
+      <h2 class="text-2xl font-bold mb-4 text-center">Choose Your Model</h2>
+      <div class="flex justify-center gap-4">
+        <button id="nbModelBtn" onclick="selectModel('NB')" class="px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition duration-300 w-40">
+          NB Model
+        </button>
+        <button id="svmModelBtn" onclick="selectModel('SVM')" class="px-6 py-3 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-emerald-700 rounded-lg shadow-lg hover:from-emerald-600 hover:to-emerald-800 transform hover:scale-105 transition duration-300 w-40">
+          SVM Model
+        </button>
+      </div>
+      <div class="text-center mt-4">
+        <span class="text-gray-300">Selected Model:</span>
+        <span id="selectedModelText" class="font-bold ml-2">NB</span>
+      </div>
+    </div>
+
+    <!-- Input Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Text Input Section -->
+      <div class="bg-white/10 backdrop-blur-lg rounded-xl p-8">
+        <h2 class="text-2xl font-bold mb-4">Single Review Analysis</h2>
+        <div class="space-y-4">
+          <textarea 
+            id="textInput" 
+            class="w-full p-4 bg-white/5 border border-gray-500 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-300 text-white placeholder-gray-400" 
+            rows="4" 
+            placeholder="Type your review here..."
+          ></textarea>
+          <button onclick="predict()" class="w-full px-6 py-3 text-lg font-semibold bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition duration-300">
+            Analyze Sentiment
+          </button>
+        </div>
+      </div>
+
+      <!-- File Upload Section -->
+      <div class="bg-white/10 backdrop-blur-lg rounded-xl p-8">
+        <h2 class="text-2xl font-bold mb-4">Batch Analysis</h2>
+        <div class="space-y-4">
+          <div class="border-2 border-dashed border-gray-500 rounded-lg p-6 text-center">
+            <input type="file" id="csvFileInput" accept=".csv" class="hidden" />
+            <label for="csvFileInput" class="cursor-pointer">
+              <div class="text-gray-300 mb-2">
+                <i class="fas fa-cloud-upload-alt text-4xl mb-2"></i>
+                <p>Drop your CSV file here<br>or click to browse</p>
+              </div>
+            </label>
+          </div>
+          <button onclick="predictCSV()" class="w-full px-6 py-3 text-lg font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg shadow-lg hover:from-indigo-600 hover:to-blue-600 transform hover:scale-105 transition duration-300">
+            Process CSV File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="mt-8 bg-white/10 backdrop-blur-lg rounded-xl p-8 text-center">
+      <h2 class="text-2xl font-bold mb-4">Analysis Result</h2>
+      <div id="predictionResult" class="text-xl font-medium"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedModel = "NB";  // Default model
+
+  function selectModel(model) {
+      selectedModel = model;
+      document.getElementById("selectedModelText").innerText = model;
+      document.getElementById("nbModelBtn").classList.toggle("bg-blue-800", model === "NB");
+      document.getElementById("svmModelBtn").classList.toggle("bg-green-800", model === "SVM");
+  }
+
+  function predict() {
+      var textInput = document.getElementById("textInput").value.trim();
+      var predictionResult = document.getElementById("predictionResult");
+
+      if (textInput === "") {
+          predictionResult.innerHTML = "<span class='text-red-500'>Please enter a review before predicting.</span>";
+          return;
+      }
+
+      fetch("http://localhost:5000/predict", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ "text": textInput, "model": selectedModel })  // Sending selected model
+      })
+      .then(response => response.json())
+      .then(data => {
+          let emoji = data.prediction === "Positive" ? "😊" : data.prediction === "Neutral" ? "😐" : "😞";
+          predictionResult.innerHTML = `Predicted sentiment: ${data.prediction} ${emoji}`;
+      });
+  }
+
+  function predictCSV() {
+      var csvFileInput = document.getElementById("csvFileInput");
+      var predictionResult = document.getElementById("predictionResult");
+      
+      if (csvFileInput.files.length === 0) {
+          predictionResult.innerHTML = "<span class='text-red-500'>Please select a CSV file before predicting.</span>";
+          return;
+      }
+
+      var formData = new FormData();
+      formData.append("file", csvFileInput.files[0]);
+      formData.append("model", selectedModel);
+
+      fetch("http://localhost:5000/predict", {
+          method: "POST",
+          body: formData
+      })
+      .then(response => response.blob())
+      .then(blob => {
+          let url = URL.createObjectURL(blob);
+          let a = document.createElement("a");
+          a.href = url;
+          a.download = "Predictions.csv";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+      });
+  }
+</script>
+</body>
+</html>
+
+<!-- Anthropic. (2024, February 2). Conversation with Claude 3.5 Sonnet about enhancing a sentiment analysis web interface using Tailwind CSS [Chat conversation]. Claude AI Chat. -->
