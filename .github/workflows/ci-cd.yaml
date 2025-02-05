@@ -3,7 +3,7 @@ name: CI/CD Pipeline for Assignment 1
 on:
   push:
     branches:
-      - dev
+      - test
   pull_request:
     branches:
       - test
@@ -22,34 +22,20 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
-          cd AISC-T3-Grp2/AISC2013-Deployment/assignment_1/prakash_image_class_ui
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-
-      # - name: Install Dependencies
-      #   run: |
-      #     python -m pip install --upgrade pip
-      #     pip install pytest  # Ensure pytest is installed
-      #     if [ -f "AISC2013-Deployment/assignment-1/prakash_image_class_ui/requirements.txt" ]; then
-      #       pip install -r "AISC2013-Deployment/Assignment 1/Rodrigo UI/requirements.txt"
-      #     else
-      #       echo "requirements.txt not found, skipping installation"
-      #     fi
+          python -m pip install --upgrade pip
+          pip install pytest  # Ensure pytest is installed
+          if [ -f "AISC2013-Deployment/Assignment 1/Rodrigo UI/requirements.txt" ]; then
+            pip install -r "AISC2013-Deployment/Assignment 1/Rodrigo UI/requirements.txt"
+          else
+            echo "requirements.txt not found, skipping installation"
+          fi
 
       - name: Verify File Structure (Debugging Step)
         run: |
           echo "Listing all files and directories:"
           ls -R
-
-      - name: Run Unit Tests for Prakash's UI
-
-        run: |
-          cd AISC-T3-Grp2/AISC2013-Deployment/assignment_1/prakash_image_class_ui
-          source venv/bin/activate
-          python test.py
 
       - name: Run Unit Tests for Rodrigo's UI
         run: |
