@@ -31,7 +31,7 @@ jobs:
       # Install dependencies and run tests for prakash_image_class_ui
       - name: Install dependencies for prakash_image_class_ui
         run: |
-          cd assignment_1/prakash_image_class_ui
+          cd AISC2013-Deployment/assignment_1/prakash_image_class_ui
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
@@ -39,14 +39,14 @@ jobs:
 
       - name: Run tests for prakash_image_class_ui
         run: |
-          cd assignment_1/prakash_image_class_ui
+          cd AISC2013-Deployment/assignment_1/prakash_image_class_ui
           source venv/bin/activate
           python -m unittest ui_test_2.py  # Using unittest instead of pytest
 
       # Install dependencies and run tests for Rodrigo UI
       - name: Install dependencies for Rodrigo UI
         run: |
-          cd assignment_1/Rodrigo\ UI
+          cd AISC2013-Deployment/assignment_1/Rodrigo\ UI
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
@@ -54,7 +54,7 @@ jobs:
 
       - name: Run tests for Rodrigo UI
         run: |
-          cd assignment_1/Rodrigo\ UI
+          cd AISC2013-Deployment/assignment_1/Rodrigo\ UI
           source venv/bin/activate
           python -m unittest ui_test_1.py  # Using unittest instead of pytest
 
