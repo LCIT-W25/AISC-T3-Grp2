@@ -3,10 +3,14 @@ name: Flask App Test
 on:
   push:
     branches:
+      - dev
+      - test
       - prakash-dev # Adjust to your default branch
   pull_request:
     branches:
       - prakash-dev # Adjust to your default branch
+      - dev
+      - test
 
 jobs:
   test:
