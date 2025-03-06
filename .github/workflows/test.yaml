@@ -1,0 +1,40 @@
+name: CI Test
+
+on:
+  push:
+    branches:
+      - dev
+      - test
+      - prakash-test
+  pull_request:
+    branches:
+      - dev
+      - test
+      - prakash-test
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3 # Latest version
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4 # Latest setup-python action
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies f
+        run: |
+          cd AISC2013-Deployment/case_study_2/prakash/image-classification
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          cd AISC2013-Deployment/case_study_2/prakash/image-classification
+          source venv/bin/activate
+          python -m unittest test.py
