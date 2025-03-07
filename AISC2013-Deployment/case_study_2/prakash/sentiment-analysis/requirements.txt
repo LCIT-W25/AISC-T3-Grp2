@@ -53,6 +53,7 @@ tensorboard-data-server==0.7.2
 tensorflow==2.18.0
 termcolor==2.5.0
 textsearch==0.0.24
+tf_keras==2.18.0
 tokenizers==0.21.0
 torch==2.6.0
 tqdm==4.67.1
