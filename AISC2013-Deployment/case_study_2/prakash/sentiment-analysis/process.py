@@ -13,21 +13,6 @@ from nltk.stem import WordNetLemmatizer
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-app = Flask(__name__, template_folder="templates")
-app.config['WTF_CSRF_ENABLED'] = True
-
-# Load the RNN model (as .h5)
-rnn_model = load_model('best_model_rnn.h5')
-
-# Load the GRU model (as .pth)
-# gru_model = torch.load('best_biGRU_model.pth')
-# gru_model.eval()
-
-# Sentiment analysis pipeline (for interpretability)
-sentiment_pipeline = pipeline("sentiment-analysis")
-
-# Preprocessing functions
-
 
 def clean_text(text):
     text = text.lower()
@@ -75,43 +60,7 @@ def preprocess_input(text):
     return text
 
 
-# Tokenizer setup (make sure it's the same tokenizer you used during training)
-tokenizer = Tokenizer(num_words=5000)
-# tokenizer.fit_on_texts(df['Tweet'])
+text = preprocess_input(
+    "Hey @user, check out this link http://example.com #example I'm smh at ur idk moment 😂")
 
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-
-@app.route('/predict', methods=['POST'])
-def predict():
-    text = request.form['text']
-
-    # Preprocess the input text
-    processed_text = preprocess_input(text)
-
-    # Tokenization and Padding
-    processed_seq = tokenizer.texts_to_sequences([processed_text])
-    padded_seq = pad_sequences(processed_seq, maxlen=50)
-
-    # Get prediction from RNN model
-    rnn_pred = rnn_model.predict(padded_seq)
-
-    # Get prediction from GRU model
-    # gru_input = torch.tensor(padded_seq)
-    # gru_pred = gru_model(gru_input)
-
-    # Interpretability (using HuggingFace Sentiment Pipeline)
-    sentiment = sentiment_pipeline(text)[0]
-
-    return render_template('index.html',
-                           text=text,
-                           rnn_result=rnn_pred,
-                           #    gru_result=gru_pred.item(),
-                           sentiment=sentiment['label'])
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
+print(text)
