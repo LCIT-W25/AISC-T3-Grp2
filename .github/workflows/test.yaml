@@ -13,40 +13,31 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ["image-classification", "sentiment-analysis"]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3 # Latest version
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v4 # Latest setup-python action
+        uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - name: Install dependencies Image Classification
+      - name: Install dependencies
+        working-directory: AISC2013-Deployment/case_study_2/prakash/${{ matrix.project }}
         run: |
-          cd AISC2013-Deployment/case_study_2/prakash/image-classification
           python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          venv/bin/python -m pip install --upgrade pip
+          venv/bin/python -m pip install -r requirements.txt
 
-      - name: Run tests Image Classification
+      - name: Download NLTK Data
         run: |
-          cd AISC2013-Deployment/case_study_2/prakash/image-classification
-          source venv/bin/activate
-          python -m unittest test.py
+          venv/bin/python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('wordnet')"
 
-      - name: Install dependencies Sentiment Analysis
+      - name: Run tests
+        working-directory: AISC2013-Deployment/case_study_2/prakash/${{ matrix.project }}
         run: |
-          cd AISC2013-Deployment/case_study_2/prakash/sentiment-analysis
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run tests Sentiment Analysis
-        run: |
-          cd AISC2013-Deployment/case_study_2/prakash/sentiment-analysis
-          source venv/bin/activate
-          python -m unittest test.py
+          venv/bin/python -m unittest test.py
