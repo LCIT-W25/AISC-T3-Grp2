@@ -26,18 +26,17 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install dependencies and Download NLTK Data
         working-directory: AISC2013-Deployment/case_study_2/prakash/${{ matrix.project }}
         run: |
           python -m venv venv
-          venv/bin/python -m pip install --upgrade pip
-          venv/bin/python -m pip install -r requirements.txt
-
-      - name: Download NLTK Data
-        run: |
-          venv/bin/python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('wordnet')"
+          source venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('wordnet')"
 
       - name: Run tests
         working-directory: AISC2013-Deployment/case_study_2/prakash/${{ matrix.project }}
         run: |
-          venv/bin/python -m unittest test.py
+          source venv/bin/activate
+          python -m unittest test.py
