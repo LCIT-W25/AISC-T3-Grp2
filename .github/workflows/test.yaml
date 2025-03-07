@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - test
-      - prakash-test
   pull_request:
     branches:
       - test
-      - prakash-test
 
 jobs:
   test:
@@ -34,7 +32,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Install NLTK and Download Data (Only for Sentiment Analysis)
+      - name: Install NLTK and Download Data (for Sentiment Analysis)
         if: matrix.project == 'sentiment-analysis'
         working-directory: AISC2013-Deployment/case_study_2/prakash/sentiment-analysis
         run: |
