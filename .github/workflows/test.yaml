@@ -26,13 +26,20 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies and Download NLTK Data
+      - name: Install dependencies
         working-directory: AISC2013-Deployment/case_study_2/prakash/${{ matrix.project }}
         run: |
           python -m venv venv
           source venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
+
+      - name: Install NLTK and Download Data (Only for Sentiment Analysis)
+        if: matrix.project == 'sentiment-analysis'
+        working-directory: AISC2013-Deployment/case_study_2/prakash/sentiment-analysis
+        run: |
+          source venv/bin/activate
+          python -m pip install nltk
           python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('wordnet')"
 
       - name: Run tests
