@@ -3,12 +3,10 @@ name: CI Test
 on:
   push:
     branches:
-      - dev
       - test
       - prakash-test
   pull_request:
     branches:
-      - dev
       - test
       - prakash-test
 
@@ -25,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies f
+      - name: Install dependencies Image Classification
         run: |
           cd AISC2013-Deployment/case_study_2/prakash/image-classification
           python -m venv venv
@@ -33,8 +31,22 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Run tests Image Classification
         run: |
           cd AISC2013-Deployment/case_study_2/prakash/image-classification
+          source venv/bin/activate
+          python -m unittest test.py
+
+      - name: Install dependencies Sentiment Analysis
+        run: |
+          cd AISC2013-Deployment/case_study_2/prakash/sentiment-analysis
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests Sentiment Analysis
+        run: |
+          cd AISC2013-Deployment/case_study_2/prakash/sentiment-analysis
           source venv/bin/activate
           python -m unittest test.py
