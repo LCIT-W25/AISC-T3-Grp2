@@ -8,6 +8,7 @@ import os
 import json
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
+app.config['WTF_CSRF_ENABLED'] = True
 CORS(app)
 
 def load_config():

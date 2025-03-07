@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classifier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white px-4 py-12">
+  <div class="container mx-auto max-w-4xl">
+    <div class="text-center mb-12">
+      <h1 class="text-6xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-indigo-400">
+        Image Classifier
+      </h1>
+      <p class="text-xl text-gray-300">Upload an image to classify</p>
+    </div>
+
+    <!-- Model Selection -->
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-8 text-center mb-8">
+      <h2 class="text-2xl font-bold mb-4">Choose a Model</h2>
+      <div class="flex justify-center gap-4">
+        <button id="efficientNetBtn" onclick="selectModel('EfficientNet')" 
+          class="px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg hover:scale-105 transition duration-300 w-40">
+          EfficientNet
+        </button>
+        <button id="cnnModelBtn" onclick="selectModel('CNN')" 
+          class="px-6 py-3 text-lg font-semibold bg-gradient-to-r from-green-500 to-green-700 rounded-lg shadow-lg hover:scale-105 transition duration-300 w-40">
+          CNN Model
+        </button>
+      </div>
+      <div class="text-center mt-4">
+        <span class="text-gray-300">Selected Model:</span>
+        <span id="selectedModelText" class="font-bold ml-2">EfficientNet</span>
+      </div>
+    </div>
+
+    <!-- Image Upload Section -->
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-8 text-center">
+      <h2 class="text-2xl font-bold mb-4">Upload an Image</h2>
+      <div class="border-2 border-dashed border-gray-500 rounded-lg p-6 text-center">
+        <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="previewImage(event)" />
+        <label for="imageInput" class="cursor-pointer">
+          <i class="fas fa-cloud-upload-alt text-4xl mb-2"></i>
+          <p>Click to upload an image</p>
+        </label>
+      </div>
+    </div>
+
+    <!-- Image Display Section -->
+    <div class="mt-8 bg-white/10 backdrop-blur-lg rounded-xl p-8 text-center hidden" id="imagePreviewSection">
+      <h2 class="text-2xl font-bold mb-4">Uploaded Image</h2>
+      <img id="uploadedImage" class="mx-auto rounded-lg shadow-lg" width="300" alt = "Uploaded Image" />
+      <button onclick="predictImage()" class="w-full px-6 py-3 mt-4 text-lg font-semibold bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg hover:scale-105 transition duration-300">
+        Classify Image
+      </button>
+    </div>
+
+    <!-- Results Section -->
+    <div class="mt-8 bg-white/10 backdrop-blur-lg rounded-xl p-8 text-center hidden" id="resultSection">
+      <h2 class="text-2xl font-bold mb-4">Classification Result</h2>
+      <div id="predictionResult" class="text-xl font-medium"></div>
+    </div>
+    <!-- Lime Section -->
+    <div id="limeSection" class="hidden text-center mt-8 bg-white/10 p-6 rounded-lg">
+      <h2 class="text-2xl font-bold mb-4">LIME Explanation</h2>
+      <img id="limeImage" class="mx-auto rounded-lg shadow-lg" width="300" alt = "Lime Image">
+    </div>
+  
+  </div>
+</div>
+
+<script>
+let selectedModel = "EfficientNet";  // Default model
+
+function selectModel(model) {
+    selectedModel = model;
+    document.getElementById("selectedModelText").innerText = model;
+}
+
+function previewImage(event) {
+    var uploadedImage = document.getElementById("uploadedImage");
+    var imagePreviewSection = document.getElementById("imagePreviewSection");
+    var resultSection = document.getElementById("resultSection");
+    var predictionResult = document.getElementById("predictionResult");
+
+    // Clear previous prediction
+    predictionResult.innerHTML = "";
+    resultSection.classList.add("hidden");
+
+    // Reset and update image preview
+    var file = event.target.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            uploadedImage.src = e.target.result;
+            imagePreviewSection.classList.remove("hidden"); 
+        };
+        reader.readAsDataURL(file);
+    } else {
+        imagePreviewSection.classList.add("hidden");
+    }
+}
+
+function predictImage() {
+    var imageInput = document.getElementById("imageInput");
+    var predictionResult = document.getElementById("predictionResult");
+    var resultSection = document.getElementById("resultSection");
+    var limeSection = document.getElementById("limeSection");
+    var limeImage = document.getElementById("limeImage");
+
+    if (imageInput.files.length === 0) {
+        predictionResult.innerHTML = "<span class='text-red-500'>Please select an image before predicting.</span>";
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append("file", imageInput.files[0]);
+    formData.append("model", selectedModel);
+
+    fetch("http://localhost:5000/predict", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            predictionResult.innerHTML = `<span class='text-red-500'>Error: ${data.error}</span>`;
+        } else {
+            predictionResult.innerHTML = `Model Used: <strong>${data.model_used}</strong><br>
+                                          Predicted Class: <strong>${data.prediction}</strong><br>
+                                          Confidence: <strong>${data.confidence}</strong>`;
+
+            // Show LIME explanation
+            if (data.explanation_url) {
+                limeImage.src = data.explanation_url;
+                limeSection.classList.remove("hidden");
+            }
+            
+            resultSection.classList.remove("hidden");
+        }
+    })
+    .catch(error => {
+        predictionResult.innerHTML = `<span class='text-red-500'>Error: ${error.message}</span>`;
+    });
+}
+
+
+
+</script>
+</body>
+</html>
