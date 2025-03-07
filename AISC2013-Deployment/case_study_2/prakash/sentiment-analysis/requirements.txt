@@ -10,6 +10,7 @@ contractions==0.1.73
 emoji==2.14.1
 filelock==3.17.0
 Flask==3.1.0
+flask-cors==5.0.1
 flatbuffers==25.2.10
 fsspec==2025.2.0
 gast==0.6.0
@@ -50,7 +51,6 @@ sympy==1.13.1
 tensorboard==2.18.0
 tensorboard-data-server==0.7.2
 tensorflow==2.18.0
-tensorflow_intel==2.18.0
 termcolor==2.5.0
 textsearch==0.0.24
 tokenizers==0.21.0
