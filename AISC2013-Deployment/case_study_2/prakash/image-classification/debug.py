@@ -10,6 +10,7 @@ from lime import lime_image
 from skimage.segmentation import mark_boundaries
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
+app.config['WTF_CSRF_ENABLED'] = True
 CORS(app)
 
 # Create 'static/uploads' and 'static/explanations' folders

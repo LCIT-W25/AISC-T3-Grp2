@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from flask_cors import CORS
 import numpy as np
 import torch
 from tensorflow.keras.models import load_model
@@ -12,7 +13,8 @@ from nltk.stem import WordNetLemmatizer
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
+app.config['WTF_CSRF_ENABLED'] = True
 
 # Load the RNN model (as .h5)
 rnn_model = load_model('best_model_rnn.h5')
