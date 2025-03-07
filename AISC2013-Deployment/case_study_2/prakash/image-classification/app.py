@@ -12,6 +12,7 @@ import matplotlib
 # Set non-interactive backend before importing pyplot
 matplotlib.use('Agg')
 app = Flask(__name__, template_folder="templates", static_folder="static")
+app.config['WTF_CSRF_ENABLED'] = True
 CORS(app)
 
 # Create 'static/uploads' and 'static/explanations' folders
