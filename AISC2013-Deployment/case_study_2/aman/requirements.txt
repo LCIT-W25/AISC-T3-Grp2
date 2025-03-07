@@ -10,6 +10,7 @@ contractions==0.1.73
 emoji==2.14.1
 filelock==3.17.0
 Flask==3.1.0
+flask-cors==3.1.1
 flatbuffers==25.2.10
 fsspec==2025.2.0
 gast==0.6.0
