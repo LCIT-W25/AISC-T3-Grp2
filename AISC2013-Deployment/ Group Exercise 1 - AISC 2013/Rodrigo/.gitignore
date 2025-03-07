@@ -1,0 +1,20 @@
+# Virtual environments
+myenv/
+.venv/
+.myenv/
+
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment files
+.env
+*.env
+
+# System files
+.DS_Store
+Thumbs.db
+
+AISC2013 - Deployment/Group Exercise 1 - AISC 2013/Rodrigo/myenv/
+
