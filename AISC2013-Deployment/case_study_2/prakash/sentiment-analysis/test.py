@@ -24,37 +24,6 @@ class FlaskAppTests(unittest.TestCase):
         # Assuming your template has this
         self.assertIn(b'<!DOCTYPE html>', response.data)
 
-    # @patch('app.rnn_model')
-    # @patch('app.gru_model')
-    # @patch('app.sentiment_pipeline')
-    # @patch('app.tokenizer')
-    # def test_predict_route(self, mock_tokenizer, mock_sentiment_pipeline, mock_gru_model, mock_rnn_model):
-    #     """Test the prediction route with mocked models"""
-    #     # Setup mocks
-    #     mock_tokenizer.texts_to_sequences.return_value = [[1, 2, 3]]
-    #     mock_rnn_model.predict.return_value = np.array([[0.7]])
-
-    #     mock_gru_output = MagicMock()
-    #     mock_gru_output.item.return_value = 0.8
-    #     mock_gru_model.return_value = mock_gru_output
-
-    #     mock_sentiment_pipeline.return_value = [
-    #         {'label': 'POSITIVE', 'score': 0.9}]
-
-    #     # Test prediction
-    #     response = self.app.post(
-    #         '/predict', data={'text': 'This is a test message'})
-
-    #     # Verify response
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIn(b'This is a test message', response.data)
-
-    #     # Verify our mocks were called
-    #     mock_tokenizer.texts_to_sequences.assert_called_once()
-    #     mock_rnn_model.predict.assert_called_once()
-    #     mock_sentiment_pipeline.assert_called_once_with(
-    #         'This is a test message')
-
     def test_preprocess_input(self):
         """Test the text preprocessing function"""
         # Test with a sample text containing various elements to clean
