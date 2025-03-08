@@ -11,11 +11,9 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the remaining application files
-COPY app.py best_biGRU_model.pth best_model_rnn.h5 /app/
+COPY app.py bidirectional_gru_model.pth best_model_rnn.h5 /app/
 COPY templates/ /app/templates/  
 
-# Expose port 5002 for Flask
-EXPOSE 5002
 
 # Run the Flask app
 ENTRYPOINT ["python", "app.py"]

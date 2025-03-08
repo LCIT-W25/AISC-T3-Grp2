@@ -6,6 +6,7 @@ from transformers import pipeline
 import re
 import emoji
 import contractions
+import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
@@ -17,6 +18,7 @@ import numpy as np
 
 explainer = LimeTextExplainer(class_names=["Negative", "Neutral", "Positive"])
 
+nltk.download('stopwords')
 
 class BiGRU(nn.Module):
     def __init__(self, input_size, hidden_size, output_size, num_layers=1, dropout=0.3):
@@ -188,4 +190,4 @@ def predict():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)

@@ -8,4 +8,4 @@ services:
     working_dir: /app
     command: ["python", "app.py"]
     ports:
-      - "5002:5002"
+      - "5000:5000"
