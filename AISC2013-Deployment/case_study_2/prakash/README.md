@@ -20,6 +20,6 @@
 - Run test
 
   ```bash
-  python -m unittest test_app.py or
-  python3 -m unittest test_app.py
+  python -m unittest test.py or
+  python3 -m unittest test.py
   ```

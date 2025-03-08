@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request
 import torch
 from tensorflow.keras.models import load_model
@@ -14,11 +13,14 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import torch.nn as nn
 from lime.lime_text import LimeTextExplainer
-import numpy as np
 
 explainer = LimeTextExplainer(class_names=["Negative", "Neutral", "Positive"])
 
+nltk.download('punkt')
+nltk.download('punkt_tab')
 nltk.download('stopwords')
+nltk.download('wordnet')
+
 
 class BiGRU(nn.Module):
     def __init__(self, input_size, hidden_size, output_size, num_layers=1, dropout=0.3):
@@ -29,26 +31,7 @@ class BiGRU(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        print("Shape received by GRU:", x.shape)  # Debugging print
         gru_out, _ = self.gru(x)  # Don't unsqueeze here
-        print("After GRU:", gru_out.shape)  # Debugging print
-        out = self.dropout(gru_out[:, -1, :])
-        out = self.fc(out)
-        return out
-
-
-class RNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, num_layers=1, dropout=0.3):
-        super(BiGRU, self).__init__()
-        self.gru = nn.GRU(input_size, hidden_size, num_layers=num_layers,
-                          batch_first=True, bidirectional=True)
-        self.fc = nn.Linear(hidden_size * 2, output_size)
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, x):
-        print("Shape received by GRU:", x.shape)  # Debugging print
-        gru_out, _ = self.gru(x)  # Don't unsqueeze here
-        print("After GRU:", gru_out.shape)  # Debugging print
         out = self.dropout(gru_out[:, -1, :])
         out = self.fc(out)
         return out
@@ -156,11 +139,8 @@ def predict():
     sentiment_label = sentiment['label']
     sentiment_score = sentiment['score']
 
-    print("GRU Predicted Class: ", gru_pred_class)
-    print("Sentiment Label: ", sentiment_label)
-    print("Sentiment Score: ", sentiment_score)
-
     # LIME explanation
+
     def predict_fn(texts):
         # Prepare the texts for the model input
         processed_texts = [preprocess_input(t) for t in texts]
@@ -178,8 +158,6 @@ def predict():
 
     # Render the explanation as a HTML format
     explanation_html = explanation.as_html()
-
-    print(explanation_html)
 
     return render_template('index.html',
                            text=text,
