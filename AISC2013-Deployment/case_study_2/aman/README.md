@@ -8,13 +8,18 @@ docker build --no-cache -t sentiment-docker .
 
 2️⃣ Run the Docker Container
 
-Start the Flask app by running the container:
+If you are using just Docker, run the container with the following command:
 
-docker run -p 5002:5002 sentiment-docker
+docker run -p 5000:5000 sentiment-docker
 
-3️⃣ Access the Web Application
+3️⃣ Build and Run with Docker Compose
+You can also use Docker Compose to build and run the application with a single command:
+
+docker-compose up --build
+
+4️⃣ Access the Web Application
 
 Once the container is running, open your browser and visit:
 
-http://localhost:5002
+http://localhost:5000
 
