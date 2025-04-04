@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🧠 RAG Chatbot</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 {
+      color: #333;
+    }
+    #chat-box {
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      overflow-y: auto;
+      height: 400px;
+      margin-bottom: 1rem;
+    }
+    .msg {
+      margin: 0.5rem 0;
+    }
+    .user {
+      text-align: right;
+      color: #007BFF;
+    }
+    .bot {
+      text-align: left;
+      color: #333;
+    }
+    #query-input {
+      width: 100%;
+      max-width: 600px;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    #send-btn {
+      margin-top: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    #send-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 RAG Chatbot</h1>
+
+  <div id="chat-box"></div>
+
+  <input type="text" id="query-input" placeholder="Type your question here..." />
+  <button id="send-btn">Send</button>
+
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const queryInput = document.getElementById("query-input");
+    const sendBtn = document.getElementById("send-btn");
+  
+    sendBtn.addEventListener("click", async () => {
+      const query = queryInput.value.trim();
+      if (!query) return;
+  
+      // Mostrar mensaje del usuario
+      const userMsg = document.createElement("div");
+      userMsg.className = "msg user";
+      userMsg.textContent = "You: " + query;
+      chatBox.appendChild(userMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+  
+      queryInput.value = "";
+  
+      // Mensaje de "procesando..."
+      const loadingMsg = document.createElement("div");
+      loadingMsg.className = "msg bot";
+      loadingMsg.textContent = "⌛ Bot is thinking...";
+      chatBox.appendChild(loadingMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+  
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query }),
+        });
+
+        const data = await res.json();
+        loadingMsg.remove(); // Elimina el "Bot is thinking..."
+
+        const botMsg = document.createElement("div");
+        botMsg.className = "msg bot";
+        botMsg.innerHTML = `
+          <strong>Bot:</strong> ${data.response}<br>
+          <span style="font-size: 0.9em; color: #888;">
+            BERTScore F1: <strong>${data.bert_score_f1 ?? "N/A"}</strong>
+          </span>
+        `;
+        chatBox.appendChild(botMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+      } catch (err) {
+        loadingMsg.remove();
+        const errorMsg = document.createElement("div");
+        errorMsg.className = "msg bot";
+        errorMsg.style.color = "red";
+        errorMsg.textContent = "⚠️ Error: couldn't connect to the server.";
+        chatBox.appendChild(errorMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    });
+  
+    queryInput.addEventListener("keyup", function (event) {
+      if (event.key === "Enter") {
+        sendBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
