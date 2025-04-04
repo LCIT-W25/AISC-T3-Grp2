@@ -35,8 +35,8 @@ retriever = vector_db.as_retriever(search_kwargs={"k": 2})
 #)
 
 llm = ChatGroq(
-    api_key="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",          # O usa una variable de entorno
-    model="llama3-8b-8192" # Otros: llama3-70b-8192, gemma-7b-it, etc.
+    api_key="replace_with_your_key",       
+    model="llama3-8b-8192" 
 )
 
 # === Create QA Chain ===
