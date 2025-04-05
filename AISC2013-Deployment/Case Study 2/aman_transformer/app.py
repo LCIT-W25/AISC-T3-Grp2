@@ -5,8 +5,9 @@ import emoji
 import contractions
 import nltk
 import tensorflow as tf
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
+from transformers import pipeline
 from tensorflow.keras.models import load_model
 from tensorflow.keras.utils import custom_object_scope
 from nltk.corpus import stopwords
@@ -22,8 +23,6 @@ from tensorflow import keras
 nltk.download('stopwords')
 nltk.download('punkt')
 nltk.download('wordnet')
-
-explainer = LimeTextExplainer(class_names=["Negative", "Neutral", "Positive"])
 
 
 class PositionEmbedding(layers.Layer):
@@ -69,8 +68,7 @@ class TransformerBlock(layers.Layer):
 model_path = "non_causal_tf.keras"
 with custom_object_scope({'TransformerBlock': TransformerBlock, 'PositionEmbedding': PositionEmbedding}):
     model = load_model(model_path)
-
-print(model.layers[-1].get_config())
+sentiment_pipeline = pipeline("sentiment-analysis")
 
 
 stop_words = set(stopwords.words('english'))
@@ -124,12 +122,15 @@ def preprocess_input(text):
 # Load tokenizer and other components
 tokenizer = Tokenizer(num_words=5000)
 
-# Initialize LIME explainer (same as before)
-lime_explainer = LimeTextExplainer(class_names=["negative", "positive"])
 
 # Flask API setup
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 
 @app.route('/predict', methods=['POST'])
@@ -142,13 +143,11 @@ def predict():
     # Preprocess the text
     processed_text = preprocess_input(text)
 
-    print("Processed text:", processed_text)
-
     # Tokenize and pad the sequence
     sequences = tokenizer.texts_to_sequences([processed_text])
     padded_sequences = pad_sequences(sequences, maxlen=128)
 
-    # Reshape the input to match model expectations (None, 1, 100)
+   # Reshape the input to match model expectations (None, 1, 100)
     if padded_sequences.shape[1] < 100:
         padded_sequences = np.pad(padded_sequences,
                                   ((0, 0), (0, 100 -
@@ -165,10 +164,13 @@ def predict():
 
     # Determine class with highest probability
     # Adjust based on your model
-    class_names = ["negative", "neutral", "positive"]
+    class_names = ["Negative", "Neutral", "Positive"]
     predicted_class = np.argmax(prediction)
     sentiment_label = class_names[predicted_class]
     confidence = float(prediction[predicted_class])
+
+    sentiment = sentiment_pipeline(processed_text)[0]
+    sentiment_label = sentiment['label']
 
     # Generate explanation
     explanation = explain_with_lime(text)
@@ -202,7 +204,7 @@ def explain_with_lime(text):
         return model.predict(model_input)
 
     # Should match your model
-    class_names = ["negative", "neutral", "positive"]
+    class_names = ["Negative", "Neutral", "Positive"]
     lime_explainer = LimeTextExplainer(class_names=class_names)
     explanation = lime_explainer.explain_instance(
         text, predict_proba, num_features=10)

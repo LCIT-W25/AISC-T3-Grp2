@@ -3,7 +3,7 @@ import numpy as np
 import io
 import base64
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from PIL import Image
 from flask_cors import CORS
 
@@ -49,6 +49,11 @@ def image_to_base64(image):
     image.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
     return img_str
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 @app.route('/generate', methods=['POST'])
