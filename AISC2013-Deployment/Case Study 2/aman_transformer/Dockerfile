@@ -11,7 +11,7 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the remaining application files
-COPY app.py non_causal_tf.keras non_causal_tf.h5 index.html /app/
+COPY app.py non_causal_tf.keras word2vec_tweet.model templates/index.html /app/
 
 # Run the Flask app
 ENTRYPOINT ["python", "app.py"]

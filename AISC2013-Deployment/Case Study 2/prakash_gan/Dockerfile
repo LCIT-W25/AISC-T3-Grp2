@@ -11,7 +11,7 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the remaining application files
-COPY app.py best_discriminator_model.keras best_generator_model.keras index.html /app/
+COPY app.py best_discriminator_model.keras best_generator_model.keras templates/index.html /app/
 
 # Run the Flask app
 ENTRYPOINT ["python", "app.py"]
