@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Semtiment Analysis</title>
+    <title>Tweet Sentiment Analysis</title>
     <style>
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -195,34 +195,35 @@
   </head>
   <body>
     <div class="header">
-      <h1>Sentiment Analysis</h1>
+      <h1>Tweet Sentiment Analysis</h1>
+      <p>Understand the sentiment behind any tweet.</p>
     </div>
 
     <div class="container">
       <!-- Sentiment Analysis Section -->
       <div class="model-section">
-        <p>Pleae emter text below to analyze the sentiment of a review.</p>
+        <p>Please enter a tweet below to analyze its sentiment.</p>
 
         <div class="example-buttons">
           <h4>Try an example:</h4>
           <button
             class="example-btn"
-            data-text="The food was absolutely delicious and the service was outstanding. I'll definitely be coming back!"
+            data-text="Just got my hands on the new phone! Super excited, it's amazing 😍📱"
           >
-            Positive Review
+            Positive Tweet
           </button>
           <button
             class="example-btn"
-            data-text="Terrible experience. The food was cold, service was slow, and the prices were too high for what we got."
+            data-text="Why is the internet so slow today... super frustrating! 😡"
           >
-            Negative Review
+            Negative Tweet
           </button>
         </div>
 
         <textarea
           id="sentiment-text"
           rows="5"
-          placeholder="Enter a restaurant review to analyze..."
+          placeholder="Enter a tweet to analyze sentiment..."
         ></textarea>
         <button id="analyze-btn">Analyze Sentiment</button>
 
@@ -257,7 +258,6 @@
       const SENTIMENT_API = "http://127.0.0.1:5002/predict";
 
       // Elements
-      const limeContainer = document.getElementById("lime-container");
       const sentimentTextElem = document.getElementById("sentiment-text");
       const analyzeBtn = document.getElementById("analyze-btn");
       const sentimentLoading = document.getElementById("sentiment-loading");
@@ -267,24 +267,11 @@
       const tokenContainer = document.getElementById("token-container");
       const exampleBtns = document.querySelectorAll(".example-btn");
 
-      const seedInput = document.getElementById("seed-input");
-      const randomSeedBtn = document.getElementById("random-seed-btn");
-      const styleMixingInput = document.getElementById("style-mixing");
-      const styleMixingValue = document.getElementById("style-mixing-value");
-      const generateBtn = document.getElementById("generate-btn");
-      const ganLoading = document.getElementById("gan-loading");
-      const ganResult = document.getElementById("gan-result");
-      const usedSeed = document.getElementById("used-seed");
-      const usedStyleMixing = document.getElementById("used-style-mixing");
-      const generatedImage = document.getElementById("generated-image");
-
-      // Event Listeners
       analyzeBtn.addEventListener("click", analyzeSentiment);
       exampleBtns.forEach((btn) => {
         btn.addEventListener("click", loadExample);
       });
 
-      // Functions for Sentiment Analysis
       function loadExample() {
         sentimentTextElem.value = this.dataset.text;
       }
@@ -292,11 +279,10 @@
       async function analyzeSentiment() {
         const text = sentimentTextElem.value.trim();
         if (!text) {
-          alert("Please enter some text to analyze");
+          alert("Please enter a tweet to analyze.");
           return;
         }
 
-        // Show loading
         sentimentLoading.style.display = "block";
         sentimentResult.style.display = "none";
 
@@ -326,7 +312,6 @@
       function displaySentimentResults(data) {
         const { prediction, explanation } = data;
 
-        // Display prediction
         sentimentLabel.textContent = prediction.label;
         sentimentLabel.className =
           prediction.label.toLowerCase() === "positive"
@@ -334,10 +319,7 @@
             : "negative";
         sentimentScore.textContent = Math.round(prediction.score * 100);
 
-        // Display token impact
         tokenContainer.innerHTML = "";
-
-        console.log("Token Impact Data:", explanation.words, explanation.html);
 
         explanation.words.forEach(([token, impact]) => {
           const tokenElem = document.createElement("span");
@@ -350,7 +332,6 @@
           tokenContainer.appendChild(tokenElem);
         });
 
-        // Show results
         sentimentResult.style.display = "block";
       }
     </script>
