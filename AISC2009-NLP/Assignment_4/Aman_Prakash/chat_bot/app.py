@@ -5,22 +5,14 @@ import torch.nn.functional as F
 from flask import Flask, request, jsonify, render_template
 from gensim.models import KeyedVectors
 import re
-import os
+
 
 app = Flask(__name__)
 
 # Constants
-MAX_SEQ_LENGTH = 100
-VOCAB_SIZE = 50000  # Adjust based on your model's vocabulary size
+MAX_SEQ_LENGTH = 128
+VOCAB_SIZE = 84000  # Adjust based on your model's vocabulary size
 EMBEDDING_DIM = 300  # Since you're using Google's word2vec which is 300-dimensional
-NUM_HEADS = 8
-NUM_LAYERS = 6
-D_MODEL = 512
-D_FF = 2048
-DROPOUT = 0.1
-
-# Dictionary to store conversation history
-conversation_sessions = {}
 
 
 class CausalTransformer(nn.Module):
@@ -79,6 +71,7 @@ class CausalTransformer(nn.Module):
 
 
 class ChatBot:
+
     def __init__(self, model_path, word2vec_path):
         # Load word embeddings
         print("Loading word embeddings...")
@@ -108,8 +101,8 @@ class ChatBot:
 
         # Add CausalTransformer to safe globals list for PyTorch 2.6+
         print("Adding to safe globals...")
-        torch.serialization.add_safe_globals(
-            [CausalTransformer])
+        # torch.serialization.add_safe_globals(
+        #     [CausalTransformer])
 
         # Load pretrained weights with correct parameters
         print(f"Loading model from {model_path}...")
@@ -150,6 +143,10 @@ class ChatBot:
         # Clean and tokenize
         text = text.lower()
         text = re.sub(r'[^\w\s]', '', text)
+        text = re.sub(r'[^a-zA-Z0-9\s.,?!]', '', text)
+        text = re.sub(r'@[\w]+', ' ', text)  # Remove mentions
+        text = re.sub(r'http\S+|www\S+', ' ', text)  # Remove URLs
+        text = re.sub(r'[^\x00-\x7F]+', '', text)  # Remove emojis
         words = text.split()
 
         # Convert to indices
@@ -165,13 +162,9 @@ class ChatBot:
 
         return torch.tensor([indices], dtype=torch.long)
 
-    def generate_response(self, input_text, conversation_history=None, max_length=50):
-        if conversation_history is None:
-            conversation_history = ""
-
-        full_context = conversation_history + " " + \
-            input_text if conversation_history else input_text
-        input_tensor = self.preprocess(full_context)
+    def generate_response(self, input_text, max_length=50):
+        full_context = input_text
+        input_tensor = self.preprocess(input_text)
 
         with torch.no_grad():
             for _ in range(max_length):
@@ -202,7 +195,7 @@ class ChatBot:
             response = response.replace('<PAD>', '').replace('<UNK>', '')
             response = re.sub(r'\s+', ' ', response).strip()
 
-        return response, full_context + " " + response
+        return response
 
 
 # Load chatbot globally
@@ -224,21 +217,13 @@ def home():
 def chat():
     data = request.json
     user_message = data.get('message', '')
-    session_id = data.get('session_id', 'default')
-
-    # Check if model is loaded
+    if not user_message:
+        return jsonify({'response': 'Please provide a message.'})
     if not model_loaded:
         return jsonify({'response': 'Sorry, the chatbot model could not be loaded. Please check the server logs.'})
 
-    # Get conversation history
-    conversation_history = conversation_sessions.get(session_id, '')
-
-    # Generate response
-    response, updated_history = chatbot.generate_response(
-        user_message, conversation_history)
-
-    # Update conversation history
-    conversation_sessions[session_id] = updated_history
+    response = chatbot.generate_response(
+        user_message)
 
     return jsonify({'response': response})
 
