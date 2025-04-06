@@ -208,14 +208,11 @@
           <h4>Try an example:</h4>
           <button
             class="example-btn"
-            data-text="Just got my hands on the new phone! Super excited, it's amazing 😍📱"
+            data-text="I love coding and building applications!"
           >
             Positive Tweet
           </button>
-          <button
-            class="example-btn"
-            data-text="Why is the internet so slow today... super frustrating! 😡"
-          >
+          <button class="example-btn" data-text="I hate coding">
             Negative Tweet
           </button>
         </div>
@@ -310,7 +307,7 @@
       }
 
       function displaySentimentResults(data) {
-        const { prediction, explanation } = data;
+        const { prediction, explanation, html } = data;
 
         sentimentLabel.textContent = prediction.label;
         sentimentLabel.className =
@@ -321,18 +318,23 @@
 
         tokenContainer.innerHTML = "";
 
-        explanation.words.forEach(([token, impact]) => {
-          const tokenElem = document.createElement("span");
+        if (explanation.length === 0) {
+          tokenContainer.innerHTML =
+            "<p>No words had a significant impact.</p>";
+        } else {
+          explanation.forEach(([token, impact]) => {
+            const tokenElem = document.createElement("span");
 
-          tokenElem.textContent = token;
-          tokenElem.className =
-            impact > 0 ? "token positive" : "token negative";
-          tokenElem.title = `Impact: ${impact.toExponential(3)}`;
+            tokenElem.textContent = token;
+            tokenElem.className =
+              impact > 0 ? "token positive" : "token negative";
+            tokenElem.title = `Impact: ${impact.toExponential(3)}`;
 
-          tokenContainer.appendChild(tokenElem);
-        });
+            tokenContainer.appendChild(tokenElem);
+          });
 
-        sentimentResult.style.display = "block";
+          sentimentResult.style.display = "block";
+        }
       }
     </script>
   </body>
