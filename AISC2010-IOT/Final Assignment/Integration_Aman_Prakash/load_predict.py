@@ -4,7 +4,7 @@ import datetime
 
 # Load the environment and model
 env = UdacitySimEnv()
-model = PPO.load("ppo-udacity-v2", env=env)
+model = PPO.load("ppo-udacity_200000_steps", env=env)
 
 # Logging setup
 log_file = open("inference_log.csv", "w")
