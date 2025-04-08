@@ -1,0 +1,7 @@
+venv
+.env
+env
+__pycache__/
+*.
+sensor_data.csv
+frame.jpg
