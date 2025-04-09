@@ -1,14 +1,19 @@
+# load_predict.py
 from stable_baselines3 import PPO
-from udacity_env import UdacitySimEnv
+from udacity_env_rl import UdacitySimEnv
+import numpy as np
 import datetime
+import requests
+import time
 
-# Load the environment and model
-env = UdacitySimEnv()
-model = PPO.load("ppo-udacity-v2", env=env)
+# Load model
+print("[MODEL] Loading PPO model...")
+model = PPO.load("ppo-udacity_200000_steps")
 
 # Logging setup
-log_file = open("inference_log.csv", "w")
-log_file.write("timestamp,steering,throttle,reward,speech_output,done\n")
+log_file = open("inference_log.csv", "a")
+log_file.write("timestamp,steering,throttle,speech_output\n")
+
 
 def format_speech(steer, throttle):
     steer_deg = abs(steer * 25)
@@ -20,21 +25,37 @@ def format_speech(steer, throttle):
     else:
         return f"{direction} {steer_deg:.1f} degrees, {motion} {speed:.1f} kilometers per hour"
 
-# Start inference
-obs = env.reset()
-done = False
 
-while not done:
-    action, _ = model.predict(obs)
-    steer, throttle = float(action[0]), float(action[1])
-    speech = format_speech(steer, throttle)
+def run_prediction_loop():
+    env = UdacitySimEnv(predict=True)
+    obs = env.reset()
 
-    obs, reward, done, info = env.step(action)
+    while True:
+        action, _ = model.predict(obs)
+        steer, throttle = float(action[0]), float(action[1])
+        speech = format_speech(steer, throttle)
 
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_line = f"{timestamp},{steer:.3f},{throttle:.3f},{reward:.2f},\"{speech}\",{done}\n"
-    log_file.write(log_line)
-    print(log_line.strip())
+        # Send to audio server
+        try:
+            requests.post("http://localhost:5005/say", json={
+                "steer": steer,
+                "throttle": throttle
+            })
+        except Exception as e:
+            print("[Audio Server Error]", e)
 
-log_file.close()
-env.close()
+        # Log to CSV
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_file.write(
+            f"{timestamp},{steer:.3f},{throttle:.3f},\"{speech}\"\n")
+        log_file.flush()
+
+        print(
+            f"[ACTION] Steer: {steer:.2f}, Throttle: {throttle:.2f} | {speech}")
+
+        obs, _, _, _ = env.step(action)
+        time.sleep(0.5)
+
+
+if __name__ == "__main__":
+    run_prediction_loop()
